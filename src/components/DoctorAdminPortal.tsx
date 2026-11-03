@@ -285,7 +285,7 @@ export const DoctorAdminPortal: React.FC = () => {
                 Attach DICOM / JPG Sonogram Clips
               </span>
               <span className="text-[11px] text-slate-500 block">
-                Direct integration with GE Voluson PACS and Malaffi / Nabidh
+                Direct integration with GE Voluson PACS and Hospital DICOM Servers
               </span>
             </div>
 

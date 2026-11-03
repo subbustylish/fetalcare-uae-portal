@@ -35,7 +35,7 @@ export const DOCTOR_PROFILE = {
     'Royal College of Obstetricians & Gynaecologists (FRCOG UK)',
     'Department of Health - Abu Dhabi (DoH) Consultant License',
     'Dubai Health Authority (DHA) Consultant License',
-    'Integrated with Malaffi & Nabidh Health Exchanges'
+    'Fellow of Maternal-Fetal Medicine (ISUOG)'
   ],
   acceptedInsurances: [
     'Daman / Thiqa Network',

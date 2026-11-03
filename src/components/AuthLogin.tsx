@@ -46,7 +46,7 @@ export const AuthLogin: React.FC<AuthLoginProps> = ({ onLogin }) => {
   const handleDoctorSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setIsAuthenticating(true);
-    setAuthSuccessMsg('Verifying Consultant Medical License & Malaffi credentials...');
+    setAuthSuccessMsg('Verifying Consultant Medical License credentials...');
     setTimeout(() => {
       setIsAuthenticating(false);
       onLogin('doctor');
@@ -70,10 +70,6 @@ export const AuthLogin: React.FC<AuthLoginProps> = ({ onLogin }) => {
           <p className="text-xs text-teal-200/90 mt-1 font-medium">
             Dr. Tariq Al-Hashimi · Maternal-Fetal Medicine
           </p>
-          <div className="mt-3 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-teal-950/60 border border-teal-700/50 text-[10px] text-teal-300">
-            <ShieldCheck className="w-3 h-3 text-teal-400" />
-            <span>UAE Health Data Compliant (Malaffi & Nabidh)</span>
-          </div>
         </div>
 
         {/* Role Selector Tabs */}
@@ -87,7 +83,7 @@ export const AuthLogin: React.FC<AuthLoginProps> = ({ onLogin }) => {
             }`}
           >
             <User className="w-4 h-4 text-teal-600" />
-            <span>Patient Sign In</span>
+            <span>Mother View</span>
           </button>
 
           <button
