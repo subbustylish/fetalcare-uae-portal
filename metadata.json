@@ -1,0 +1,6 @@
+{
+  "name": "FetalCare UAE - Maternal-Fetal Medicine & OB/GYN Portal",
+  "description": "Specialist Obstetrics, Gynecology & Maternal-Fetal Medicine digital portal inspired by Mediclinic & Sahatna, featuring 3D scan vault, gestational age timeline, kick counter, and appointment booking.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

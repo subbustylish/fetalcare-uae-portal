@@ -1,0 +1,20 @@
+{
+  "id": "/",
+  "name": "FetalCare UAE | Dr. Tariq Al-Hashimi",
+  "short_name": "FetalCare",
+  "description": "Specialist Obstetrics, Gynecology & Maternal-Fetal Medicine digital portal in the UAE.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0f172a",
+  "theme_color": "#0d9488",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
