@@ -1,11 +1,16 @@
+import { ConceptionType, EddMethod, CarePathway, HealthcareFacility } from './types/clinical';
+
 export type ScanType = 
   | 'nt_scan' 
   | 'anomaly_scan' 
   | 'fetal_echo' 
   | 'growth_doppler' 
+  | 'routine_growth_34_36'
   | '3d_4d_hd' 
   | 'cervical_length' 
   | 'high_risk_consult';
+
+export * from './types/clinical';
 
 export interface FetalBiometrics {
   bpdMm: number; // Biparietal diameter
@@ -111,4 +116,16 @@ export interface PatientProfile {
     tier: string;
   };
   highRiskFactors: string[];
+  // DOH Phase 1 clinical extensions
+  lmpCertain?: boolean;
+  cycleLengthDays?: number;
+  conceptionType?: ConceptionType;
+  oocyteRetrievalDate?: string;
+  eddMethod?: EddMethod;
+  eddLocked?: boolean;
+  carePathway?: CarePathway;
+  facility?: HealthcareFacility;
+  bmi?: number;
+  age?: number;
+  cptCodesOnActiveCarePlan?: string[];
 }

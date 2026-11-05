@@ -17,6 +17,17 @@ export const GestationalHero: React.FC<GestationalHeroProps> = ({
   const currentTotalWeeks = patient.currentGestationalWeeks + patient.currentGestationalDays / 7;
   const progressPercent = Math.min(100, Math.round((currentTotalWeeks / totalWeeks) * 100));
 
+  const eddFormatted = new Date(patient.eddDate).toLocaleDateString('en-US', {
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric'
+  });
+
+  const trimesterLabel = 
+    patient.currentGestationalWeeks <= 13 ? 'Trimester 1 · Early Growth' :
+    patient.currentGestationalWeeks <= 27 ? 'Trimester 2 · Golden Phase' :
+    'Trimester 3 · Preparation';
+
   return (
     <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-teal-900 via-teal-800 to-slate-900 text-white p-5 sm:p-8 shadow-xl border border-teal-700/40">
       {/* Decorative Womb Radiance Background Circles */}
@@ -29,10 +40,10 @@ export const GestationalHero: React.FC<GestationalHeroProps> = ({
           <div className="flex flex-wrap items-center gap-2 text-xs font-medium text-teal-200">
             <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-teal-950/60 border border-teal-600/40 backdrop-blur-xs text-[11px]">
               <span className="w-1.5 h-1.5 rounded-full bg-teal-400 animate-ping"></span>
-              <span>Trimester 2 · Golden Phase</span>
+              <span>{trimesterLabel}</span>
             </span>
             <span className="hidden sm:inline">·</span>
-            <span className="text-teal-200/90 text-[11px] sm:text-xs">EDD: March 5, 2027</span>
+            <span className="text-teal-200/90 text-[11px] sm:text-xs">EDD: {eddFormatted}</span>
           </div>
 
           <div>
@@ -69,7 +80,7 @@ export const GestationalHero: React.FC<GestationalHeroProps> = ({
               className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-white/15 hover:bg-white/25 text-white font-medium text-xs border border-white/20 transition active:scale-98 min-h-[44px]"
             >
               <Calendar className="w-4 h-4 text-teal-300" />
-              <span>Book Growth Scan (28w)</span>
+              <span>Book Routine Growth Scan (34–36w)</span>
             </button>
           </div>
         </div>

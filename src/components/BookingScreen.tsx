@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ScanType, Appointment, PatientProfile } from '../types';
 import { DOCTOR_PROFILE } from '../data/mockData';
+import { calculateGestationalAge } from '../utils/datingEngine';
 import { 
   Calendar, 
   Clock, 
@@ -40,63 +41,106 @@ export const BookingScreen: React.FC<BookingScreenProps> = ({
     maxWeeks: number;
     duration: number;
     desc: string;
+    cpt?: string;
+    isRoutine?: boolean;
   }[] = [
     {
-      type: 'growth_doppler',
-      title: 'Fetal Growth & Doppler Velocimetry (28-32w)',
-      targetRange: '28w0d – 32w6d',
-      minWeeks: 27,
+      type: 'routine_growth_34_36',
+      title: 'Third Trimester Growth Scan (34–36w)',
+      targetRange: '34w0d – 36w6d',
+      minWeeks: 34,
       maxWeeks: 36,
+      duration: 35,
+      cpt: 'CPT 76805',
+      isRoutine: true,
+      desc: 'Routine third trimester growth scan for low-risk pregnancies to assess fetal growth, fluid, presentation, and placental clearance (DOH USG 6.1.4).'
+    },
+    {
+      type: 'anomaly_scan',
+      title: 'Detailed Fetal Anatomy Scan (18–22w)',
+      targetRange: '18w0d – 22w6d',
+      minWeeks: 18,
+      maxWeeks: 23,
+      duration: 45,
+      cpt: 'CPT 76811',
+      isRoutine: true,
+      desc: 'Routine structural anomaly survey (brain, heart chambers, spine, kidneys, limbs, placenta position). Bookable up to 23+6w (DOH USG 6.4.1).'
+    },
+    {
+      type: 'nt_scan',
+      title: 'First Trimester Dating & NT Scan (11–13+6w)',
+      targetRange: '11w0d – 13w6d (CRL 45–84mm)',
+      minWeeks: 11,
+      maxWeeks: 13,
+      duration: 35,
+      cpt: 'CPT 76801 + 76813',
+      isRoutine: true,
+      desc: 'Viability, accurate CRL dating, nuchal translucency measurement, and early structural assessment (DOH USG 6.1.2).'
+    },
+    {
+      type: 'growth_doppler',
+      title: 'Serial Growth & Doppler (Indicated / High-Risk)',
+      targetRange: 'From 24–26w every 2–4 weeks',
+      minWeeks: 24,
+      maxWeeks: 40,
       duration: 40,
-      desc: 'Assesses fetal growth trajectory, amniotic fluid volume, umbilical & cerebral Doppler flow.'
+      cpt: 'CPT 76816 + 76820',
+      isRoutine: false,
+      desc: 'Medically indicated serial growth and Doppler velocimetry triggered by FGR/PET risk factors (DOH USG App.4/5).'
+    },
+    {
+      type: 'cervical_length',
+      title: 'Cervical Length Assessment (14–26w, At-Risk)',
+      targetRange: '14w0d – 26w0d',
+      minWeeks: 14,
+      maxWeeks: 26,
+      duration: 20,
+      cpt: 'CPT 76817',
+      isRoutine: false,
+      desc: 'Transvaginal cervical length screening for women at high risk of preterm delivery (prior PTB, cervical surgery, uterine anomaly) (DOH USG 6.8.2).'
+    },
+    {
+      type: 'fetal_echo',
+      title: 'Specialized Fetal Echocardiogram (19–24w)',
+      targetRange: '19w0d – 24w6d',
+      minWeeks: 19,
+      maxWeeks: 26,
+      duration: 45,
+      cpt: 'CPT 76825 / 76826',
+      isRoutine: false,
+      desc: 'Detailed fetal cardiac examination indicated for maternal diabetes, family history, or suspected cardiac anomaly (DOH USG App.6).'
     },
     {
       type: '3d_4d_hd',
-      title: '3D/4D HD-Live Keepsake & Bonding Experience',
+      title: '3D/4D HD-Live Keepsake & Bonding Scan',
       targetRange: '26w0d – 32w0d',
       minWeeks: 25,
       maxWeeks: 34,
       duration: 30,
-      desc: 'High-definition live video & facial portrait sonogram. Includes digital video export.'
-    },
-    {
-      type: 'fetal_echo',
-      title: 'Specialized Fetal Echocardiogram',
-      targetRange: '20w0d – 24w6d',
-      minWeeks: 19,
-      maxWeeks: 28,
-      duration: 45,
-      desc: 'In-depth cardiac anatomy examination for mothers with diabetes or family history of heart defects.'
+      cpt: 'CPT 76815',
+      isRoutine: false,
+      desc: 'High-definition live video & facial portrait sonogram. Includes digital video clip export.'
     },
     {
       type: 'high_risk_consult',
-      title: 'High-Risk Maternal-Fetal Consultation & Second Opinion',
+      title: 'High-Risk Maternal-Fetal Medicine Consultation',
       targetRange: 'Any Gestational Age',
       minWeeks: 4,
       maxWeeks: 42,
       duration: 50,
-      desc: 'Detailed review of previous scan reports, genetic risk (NIPT/amniocentesis), and individualized birth planning.'
-    },
-    {
-      type: 'cervical_length',
-      title: 'Cervical Surveillance & Preterm Prevention',
-      targetRange: '16w0d – 24w0d',
-      minWeeks: 15,
-      maxWeeks: 26,
-      duration: 20,
-      desc: 'Transvaginal evaluation of internal cervical os and funneling risk.'
+      cpt: 'Clinical E&M',
+      isRoutine: false,
+      desc: 'Consultation with Dr. Tariq Al-Hashimi for complex obstetric history, previous preterm birth, or fetal anomalies.'
     }
   ];
 
-  const currentOption = scanOptions.find(o => o.type === selectedScan)!;
+  const currentOption = scanOptions.find(o => o.type === selectedScan) || scanOptions[0];
 
-  // Gestational age calculation logic for selected appointment date
-  const baseDate = new Date('2026-11-03');
+  // Gestational age calculated dynamically from patient EDD and selected date
   const targetDateObj = new Date(selectedDate);
-  const diffDays = Math.round((targetDateObj.getTime() - baseDate.getTime()) / (1000 * 60 * 60 * 24));
-  const totalDaysOnTarget = (patient.currentGestationalWeeks * 7 + patient.currentGestationalDays) + diffDays;
-  const targetWeeks = Math.floor(totalDaysOnTarget / 7);
-  const targetDays = totalDaysOnTarget % 7;
+  const gaAtTargetDate = calculateGestationalAge(patient.eddDate, targetDateObj);
+  const targetWeeks = gaAtTargetDate.weeks;
+  const targetDays = gaAtTargetDate.days;
 
   const isTimingIdeal = targetWeeks >= currentOption.minWeeks && targetWeeks <= currentOption.maxWeeks;
 
@@ -160,9 +204,16 @@ export const BookingScreen: React.FC<BookingScreenProps> = ({
                     : 'border-slate-200 hover:border-slate-300 bg-slate-50/50'
                 }`}
               >
-                <div className="flex items-center justify-between mb-1">
-                  <span className="font-semibold text-slate-900 text-sm">{scan.title}</span>
-                  <span className="text-[10px] font-mono text-teal-700 bg-teal-100/70 px-2.5 py-0.5 rounded font-semibold">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-1">
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    <span className="font-semibold text-slate-900 text-sm">{scan.title}</span>
+                    {scan.cpt && (
+                      <span className="text-[10px] font-mono text-teal-800 bg-teal-100 px-2 py-0.2 rounded font-bold">
+                        {scan.cpt}
+                      </span>
+                    )}
+                  </div>
+                  <span className="text-[10px] font-mono text-teal-700 bg-teal-100/70 px-2.5 py-0.5 rounded font-semibold self-start sm:self-auto">
                     {scan.targetRange}
                   </span>
                 </div>
@@ -171,6 +222,31 @@ export const BookingScreen: React.FC<BookingScreenProps> = ({
             ))}
           </div>
         </div>
+
+        {/* Mandatory Clinical Indication for Non-Routine Scans (USG 3.2) */}
+        {!currentOption.isRoutine && (
+          <div className="space-y-1.5 p-3.5 rounded-xl bg-amber-50/70 border border-amber-200 text-xs">
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-bold text-amber-900 block">
+                Documented Clinical Indication (Mandatory per DOH USG 3.2)
+              </label>
+              <span className="font-mono text-[10px] text-amber-800 font-semibold">Ref: USG 3.2</span>
+            </div>
+            <input
+              type="text"
+              defaultValue={
+                patient.highRiskFactors.length > 0 
+                  ? patient.highRiskFactors[0] 
+                  : 'Medically indicated surveillance per MFM clinical protocol'
+              }
+              placeholder="e.g. Previous Cesarean Section with low-lying placenta / MCDA twin surveillance"
+              className="w-full p-2.5 rounded-lg border border-amber-300 text-xs bg-white text-slate-800"
+            />
+            <p className="text-[10px] text-amber-800">
+              DOH guidelines require a documented clinical indication for non-routine scans prior to claims submission.
+            </p>
+          </div>
+        )}
 
         {/* Gestational Timing Verification Box (Smart Fetal Guardrail) */}
         <div className={`p-4 rounded-xl border text-xs ${

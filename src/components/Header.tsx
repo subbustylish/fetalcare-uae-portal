@@ -1,10 +1,16 @@
 import React from 'react';
 import { Smartphone, User, Stethoscope, LogOut } from 'lucide-react';
 
+import { PatientProfile } from '../types';
+import { calculateGestationalAge, parseDateIso } from '../utils/datingEngine';
+import { CURRENT_SIMULATION_DATE, DEMO_PATIENTS } from '../data/mockData';
+
 interface HeaderProps {
   activeTab: 'journey' | 'vault' | 'book' | 'vitals' | 'doctor' | 'admin';
   setActiveTab: (tab: 'journey' | 'vault' | 'book' | 'vitals' | 'doctor' | 'admin') => void;
   role: 'patient' | 'doctor';
+  patient?: PatientProfile;
+  onSelectPatient?: (p: PatientProfile) => void;
   onLogout: () => void;
 }
 
@@ -12,8 +18,14 @@ export const Header: React.FC<HeaderProps> = ({
   activeTab,
   setActiveTab,
   role,
+  patient,
+  onSelectPatient,
   onLogout,
 }) => {
+  const currentGa = patient 
+    ? calculateGestationalAge(patient.eddDate, parseDateIso(CURRENT_SIMULATION_DATE))
+    : { formatted: '22w 2d' };
+
   return (
     <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/80 px-3 sm:px-6 py-2.5 sm:py-3.5 transition-all">
       <div className="max-w-7xl mx-auto flex items-center justify-between gap-2 sm:gap-6">
@@ -31,20 +43,41 @@ export const Header: React.FC<HeaderProps> = ({
             </span>
           </div>
 
-          {/* Active Logged-In User Chip */}
-          <div className="hidden md:flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-slate-100 text-[11px] font-medium text-slate-700 border border-slate-200/60">
-            {role === 'patient' ? (
-              <>
+          {/* Active Logged-In User Chip & Cohort Selector */}
+          <div className="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-100 text-[11px] font-medium text-slate-700 border border-slate-200/60">
+            {role === 'patient' && patient ? (
+              <div className="flex items-center gap-1.5">
                 <User className="w-3.5 h-3.5 text-teal-600" />
-                <span>Sarah (22w4d)</span>
-              </>
+                <span className="font-semibold text-slate-800">{patient.name}</span>
+                <span className="text-[10px] font-mono text-teal-800 bg-teal-100/60 px-1.5 py-0.2 rounded font-bold">
+                  {currentGa.formatted}
+                </span>
+              </div>
             ) : (
-              <>
+              <div className="flex items-center gap-1.5">
                 <Stethoscope className="w-3.5 h-3.5 text-teal-600" />
                 <span>Dr. Tariq (Consultant)</span>
-              </>
+              </div>
             )}
           </div>
+
+          {/* Quick Demo Patient Switcher (Allows testing all 4 DOH spec cases) */}
+          {role === 'patient' && onSelectPatient && (
+            <select
+              value={patient?.id}
+              onChange={(e) => {
+                const target = DEMO_PATIENTS[e.target.value];
+                if (target) onSelectPatient(target);
+              }}
+              className="text-[10px] sm:text-[11px] font-medium py-1 px-1.5 sm:px-2 rounded-lg border border-teal-200 bg-teal-50/60 text-teal-900 focus:outline-none max-w-[125px] sm:max-w-none truncate"
+              title="Switch DOH Demo Case (Section 17)"
+            >
+              <option value="pt-sarah">Sarah (22w · Low-risk)</option>
+              <option value="pt-noura">Noura (27w · Placenta 14mm)</option>
+              <option value="pt-maryam">Maryam (20w · MCDA Twins)</option>
+              <option value="pt-aisha">Aisha (13w · High-Risk)</option>
+            </select>
+          )}
         </div>
 
         {/* Zone 2: Navigation Links (Desktop view only, mobile uses BottomNavBar) */}

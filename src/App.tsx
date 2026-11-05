@@ -105,6 +105,8 @@ export default function App() {
               activeTab={activeTab}
               setActiveTab={setActiveTab}
               role={currentUser}
+              patient={patient}
+              onSelectPatient={setPatient}
               onLogout={handleLogout}
             />
 
@@ -145,14 +147,17 @@ export default function App() {
                   )}
 
                   {/* Screen 4: Dedicated Maternal Vitals, Kick Counter & Labs */}
-                  {activeTab === 'vitals' && <VitalsTracker />}
+                  {activeTab === 'vitals' && <VitalsTracker patient={patient} />}
 
                   {/* Screen 5: Dedicated Dr. Tariq Al-Hashimi Profile & Emergency Triage */}
                   {activeTab === 'doctor' && <DoctorProfile />}
                 </>
               ) : (
-                /* Doctor Clinical Portal */
-                <DoctorAdminPortal />
+                /* Doctor Clinical Portal with DOH Decision Support */
+                <DoctorAdminPortal 
+                  activePatient={patient}
+                  onSelectPatient={setPatient}
+                />
               )}
             </main>
 

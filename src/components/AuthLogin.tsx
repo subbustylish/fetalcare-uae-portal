@@ -261,9 +261,9 @@ export const AuthLogin: React.FC<AuthLoginProps> = ({ onLogin }) => {
         {/* Footer Security Badges */}
         <div className="px-6 py-3 bg-slate-50 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-400">
           <span>Encrypted with TLS 1.3</span>
-          <span className="flex items-center gap-1 text-teal-700 font-medium">
-            <CheckCircle2 className="w-3 h-3 text-teal-600" />
-            DoH & DHA Compliant
+          <span className="flex items-center gap-1 text-slate-500 font-medium">
+            <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+            Clinical Decision Support System
           </span>
         </div>
       </div>
